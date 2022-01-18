@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
+using GreenHealth_API_backend.Services;
 
 namespace GreenHealth_API_backend.Controllers
 {
@@ -15,31 +16,40 @@ namespace GreenHealth_API_backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly UserService _userService;
 
-        public UsersController(DataContext context)
+        public UsersController(DataContext context, UserService service)
         {
             _context = context;
+            _userService = service;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
-            return await _context.User.ToListAsync();
+            return Ok(await _userService.GetUsers());
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var user = await _userService.GetUser(id);
 
-            return user;
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(user);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }
         }
 
         // PUT: api/Users/5
@@ -52,25 +62,20 @@ namespace GreenHealth_API_backend.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                var userresult = await _userService.PutUser(id, user);
+                if (userresult == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error writing changes to the database");
+            }
         }
 
         // POST: api/Users
@@ -78,31 +83,35 @@ namespace GreenHealth_API_backend.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            try
+            {
+                var userresult = await _userService.PostUser(user);
+                return CreatedAtAction("GetUser", new { id = userresult.Id }, userresult);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error posting data to the database");
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userService.DeleteUser(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
             }
-
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.Id == id);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting data from the database");
+            }
         }
     }
 }
