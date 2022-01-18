@@ -11,7 +11,9 @@ namespace GreenHealth_API_backend.Models
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public string Email { get; set; }
+#nullable enable
 		public string? Address { get; set; }
+#nullable disable
 		public string Password { get; set; }
 		public bool IsAdmin { get; set; }
 		public ICollection<Plant> Plants { get; set; }
