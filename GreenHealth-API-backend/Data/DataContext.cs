@@ -15,6 +15,5 @@ namespace GreenHealth_API_backend.Data
         public DbSet<User> User { get; set; }
         public DbSet<Plant> Plant { get; set; }
         public DbSet<Result> Result { get; set; }
-        public DbSet<GrowthState> GrowthState { get; set; }
     }
 }
