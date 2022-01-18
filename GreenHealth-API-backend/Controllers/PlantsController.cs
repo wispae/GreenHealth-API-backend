@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
+using GreenHealth_API_backend.Services;
 
 namespace GreenHealth_API_backend.Controllers
 {
@@ -15,31 +16,40 @@ namespace GreenHealth_API_backend.Controllers
     public class PlantsController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly PlantService _plantService;
 
-        public PlantsController(DataContext context)
+        public PlantsController(DataContext context, PlantService service)
         {
             _context = context;
+            _plantService = service;
         }
 
         // GET: api/Plants
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Plant>>> GetPlant()
         {
-            return await _context.Plant.ToListAsync();
+            return Ok(await _plantService.GetPlants());
         }
 
         // GET: api/Plants/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Plant>> GetPlant(int id)
         {
-            var plant = await _context.Plant.FindAsync(id);
-
-            if (plant == null)
+            try
             {
-                return NotFound();
-            }
+                var plant = await _plantService.GetPlant(id);
 
-            return plant;
+                if (plant == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(plant);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }  
         }
 
         // PUT: api/Plants/5
@@ -52,25 +62,20 @@ namespace GreenHealth_API_backend.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(plant).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlantExists(id))
+                var plantresult = await _plantService.PutPlant(id, plant);
+                if (plantresult == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error writing changes to the database");
+            }
         }
 
         // POST: api/Plants
@@ -78,31 +83,35 @@ namespace GreenHealth_API_backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Plant>> PostPlant(Plant plant)
         {
-            _context.Plant.Add(plant);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPlant", new { id = plant.Id }, plant);
+            try
+            {
+                var plantresult = await _plantService.PostPlant(plant);
+                return CreatedAtAction("GetPlant", new { id = plantresult.Id }, plantresult);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error posting data to the database");
+            }
         }
 
         // DELETE: api/Plants/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlant(int id)
         {
-            var plant = await _context.Plant.FindAsync(id);
-            if (plant == null)
+            try
             {
-                return NotFound();
+                var plant = await _plantService.DeletePlant(id);
+                if (plant == null)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
             }
-
-            _context.Plant.Remove(plant);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PlantExists(int id)
-        {
-            return _context.Plant.Any(e => e.Id == id);
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting data from the database");
+            }
         }
     }
 }
