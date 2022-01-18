@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenHealth-API", "GreenHealth-API\GreenHealth-API.csproj", "{877F5BF3-4CEA-4110-AC88-12CF1421168D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{877F5BF3-4CEA-4110-AC88-12CF1421168D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{877F5BF3-4CEA-4110-AC88-12CF1421168D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{877F5BF3-4CEA-4110-AC88-12CF1421168D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{877F5BF3-4CEA-4110-AC88-12CF1421168D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {21314DE6-FD2C-4CCA-9AC3-507F2E7C4237}
+	EndGlobalSection
+EndGlobal
