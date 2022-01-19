@@ -15,5 +15,12 @@ namespace GreenHealth_API_backend.Data
         public DbSet<User> User { get; set; }
         public DbSet<Plant> Plant { get; set; }
         public DbSet<Result> Result { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<User>().ToTable("User");
+			modelBuilder.Entity<Plant>().ToTable("Plant");
+			modelBuilder.Entity<Result>().ToTable("Result");
+		}
     }
 }

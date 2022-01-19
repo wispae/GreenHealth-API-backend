@@ -50,6 +50,9 @@ jobs:
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
+        env:
+          CUSTOMCONNSTR_BlobConnection: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          SQLAZURECONNSTR_DefaultConnection: ${{ secrets.AZURE_SQL_DB }}
         with:
           app-name: 'GreenHealth-API'
           slot-name: 'Production'

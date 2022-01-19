@@ -14,14 +14,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GreenHealth_API_backend.Services;
 
 namespace GreenHealth_API_backend
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		public Startup(IConfiguration configuration, IWebHostEnvironment env)
 		{
-			Configuration = configuration;
+			var builder = new ConfigurationBuilder()
+				.SetBasePath(env.ContentRootPath)
+				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+				.AddConfiguration(configuration)
+				.AddEnvironmentVariables();
+
+			Configuration = builder.Build();
 		}
 
 		public IConfiguration Configuration { get; }
@@ -32,6 +40,18 @@ namespace GreenHealth_API_backend
 			services.AddDbContext<DataContext>(opt =>
 				opt.UseSqlServer(
 					Configuration.GetConnectionString("DefaultConnection")));
+
+			services.AddScoped<PlantService>();
+			services.AddScoped<UserService>();
+			services.AddScoped<ResultService>();
+
+			services.AddCors(opt =>
+			{
+				opt.AddPolicy("CorsPolicy",
+					builder => builder.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyHeader());
+			});
 
 			services.AddControllers();
 			services.AddSwaggerGen(c =>
@@ -50,6 +70,7 @@ namespace GreenHealth_API_backend
 				app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GreenHealth_API_backend v1"));
 			}
 
+			app.UseCors("CorsPolicy");
 			app.UseHttpsRedirection();
 
 			app.UseRouting();
@@ -61,7 +82,7 @@ namespace GreenHealth_API_backend
 				endpoints.MapControllers();
 			});
 
-			DBInitializer.Initialize(context);
+			DbInitializer.Initialize(context);
 		}
 	}
 }

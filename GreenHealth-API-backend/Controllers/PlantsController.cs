@@ -1,27 +1,34 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
 
 namespace GreenHealth_API_backend.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PlantsController : ControllerBase
+	[Route("api/[controller]")]
+	[ApiController]
+
+	public class PlantsController : ControllerBase
     {
         private readonly DataContext _context;
         private readonly PlantService _plantService;
+		private string _blobConnectionString;
 
-        public PlantsController(DataContext context, PlantService service)
+		public PlantsController(DataContext context, PlantService service, IConfiguration configuration)
         {
             _context = context;
             _plantService = service;
+			//_blobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+			_blobConnectionString = configuration.GetConnectionString("BlobConnection");
         }
 
         // GET: api/Plants
@@ -52,6 +59,30 @@ namespace GreenHealth_API_backend.Controllers
             }  
         }
 
+		[HttpGet("{id}/image")]
+		public async Task<ActionResult> GetPlantImage(int id)
+		{
+			try
+			{
+				var plant = await _plantService.GetPlant(id);
+
+				if (plant == null)
+				{
+					return NotFound();
+				}
+
+				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", plant.ImagePath);
+				string filepath = "temp/tempPlantImage.jpg";
+				await blobClient.DownloadToAsync(filepath);
+				return PhysicalFile(Environment.CurrentDirectory+'\\'+filepath, "image/jpg");
+				
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+		}
+
         // PUT: api/Plants/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -77,6 +108,34 @@ namespace GreenHealth_API_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error writing changes to the database");
             }
         }
+
+		// PATCH: api/Plants/5/image
+		[HttpPatch("{id}/image")]
+		public async Task<ActionResult<Plant>> PatchPlant(int id, IFormFile image)
+		{
+			try
+			{
+				var plantResult = await _plantService.GetPlant(id);
+
+				if(plantResult == null)
+				{
+					return NotFound();
+				}
+
+				string imageName = "u" + plantResult.UserId.ToString() + "p" + plantResult.Id + ".JPG";
+				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", imageName);
+				await blobClient.UploadAsync(image.OpenReadStream());
+
+				plantResult.ImagePath = imageName;
+
+				await _plantService.PutPlant(id, plantResult);
+				return Ok(plantResult);
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+		}
 
         // POST: api/Plants
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
