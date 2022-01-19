@@ -17,5 +17,16 @@ namespace GreenHealth_API_backend.Models
 		public bool IsAdmin { get; set; }
 #nullable disable
 		public ICollection<Plant> Plants { get; set; }
+
+		public User()
+		{
+			Id = 0;
+			FirstName = "";
+			LastName = "";
+			Email = "";
+			Address = "";
+			Password = "";
+			IsAdmin = false;
+		}
 	}
 }
