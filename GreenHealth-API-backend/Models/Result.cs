@@ -11,14 +11,6 @@ namespace GreenHealth_API_backend.Models
 #nullable enable
 		public double? Accuracy { get; set; }
 #nullable disable
-		public enum GrowthStage
-		{
-			week1,
-			week2,
-			week3,
-			week4,
-			week5,
-			week6
-		}
+		public int GrowthStage { get; set; }
 	}
 }
