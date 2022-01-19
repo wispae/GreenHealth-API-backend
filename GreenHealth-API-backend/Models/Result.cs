@@ -7,10 +7,10 @@ namespace GreenHealth_API_backend.Models
 {
 	public class Result
 	{
-		public int Id { get; set; }
 #nullable enable
-		public double? Accuracy { get; set; }
+		public int Id { get; set; }
 #nullable disable
+		public double Accuracy { get; set; }
 		public enum GrowthStage
 		{
 			week1,

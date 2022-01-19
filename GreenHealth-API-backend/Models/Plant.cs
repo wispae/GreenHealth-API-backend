@@ -7,14 +7,14 @@ namespace GreenHealth_API_backend.Models
 {
 	public class Plant
 	{
-		public int Id { get; set; }
-		public User User { get; set; }
-		public int UserId { get; set; }
-		public Result Result { get; set; }
 #nullable enable
-		public int? ResultId { get; set; }
+		public int Id { get; set; }
+		public int UserId { get; set; }
 #nullable disable
+		public int? ResultId { get; set; }
 		public string ImagePath { get; set; }
-		public string? Location { get; set; }
+		public string Location { get; set; }
+		public Result Result { get; set; }
+		public User User { get; set; }
 	}
 }

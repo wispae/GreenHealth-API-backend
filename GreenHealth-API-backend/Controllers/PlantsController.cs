@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Azure.Storage.Blobs;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
@@ -17,6 +18,7 @@ namespace GreenHealth_API_backend.Controllers
     {
         private readonly DataContext _context;
         private readonly PlantService _plantService;
+		private string blobConnectionString;
 
         public PlantsController(DataContext context, PlantService service)
         {
@@ -77,6 +79,32 @@ namespace GreenHealth_API_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error writing changes to the database");
             }
         }
+
+		// PATCH: api/Plants/5/image
+		[HttpPatch("{id}/image")]
+		public async Task<IActionResult> PatchPlant(int id, IFormFile image)
+		{
+			Console.WriteLine(image.FileName);
+			return Ok();
+			/*try
+			{
+				var plantResult = await _plantService.GetPlant(id);
+
+				if(plantResult == null)
+				{
+					return NotFound();
+				}
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+
+			try
+			{
+				BlobClient blobClient = new BlobClient()
+			}*/
+		}
 
         // POST: api/Plants
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
