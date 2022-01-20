@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
@@ -27,7 +28,6 @@ namespace GreenHealth_API_backend.Controllers
         {
             _context = context;
             _plantService = service;
-			//_blobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
 			_blobConnectionString = configuration.GetConnectionString("BlobConnection");
         }
 
@@ -72,10 +72,9 @@ namespace GreenHealth_API_backend.Controllers
 				}
 
 				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", plant.ImagePath);
-				string filepath = "temp/tempPlantImage.jpg";
-				await blobClient.DownloadToAsync(filepath);
-				return PhysicalFile(Environment.CurrentDirectory+'\\'+filepath, "image/jpg");
-				
+				BlobDownloadResult result = await blobClient.DownloadContentAsync();
+				return new FileContentResult(result.Content.ToArray(), "image/jpg");
+
 			}
 			catch (Exception)
 			{
