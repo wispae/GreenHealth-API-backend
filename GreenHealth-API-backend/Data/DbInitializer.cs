@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GreenHealth_API_backend.Models;
+using static GreenHealth_API_backend.Models.Result;
 
 namespace GreenHealth_API_backend.Data
 {
@@ -21,12 +22,12 @@ namespace GreenHealth_API_backend.Data
 			// Add results
 
 			context.AddRange(
-				new Result { Accuracy = 92.6, GrowthStage = GrowthStage.week1 },
-				new Result { Accuracy = 91.2, GrowthStage = GrowthStage.week2 },
-				new Result { Accuracy = 87.98, GrowthStage = GrowthStage.week3 },
-				new Result { Accuracy = 93, GrowthStage = GrowthStage.week4 },
-				new Result { Accuracy = 997.009, GrowthStage = GrowthStage.week5 },
-				new Result { Accuracy = 95.1, GrowthStage = GrowthStage.week6 }
+				new Result { Accuracy = 92.6, Stage = GrowthStage.week1 },
+				new Result { Accuracy = 91.2, Stage = GrowthStage.week2 },
+				new Result { Accuracy = 87.98, Stage = GrowthStage.week3 },
+				new Result { Accuracy = 93, Stage = GrowthStage.week4 },
+				new Result { Accuracy = 997.009, Stage = GrowthStage.week5 },
+				new Result { Accuracy = 95.1, Stage = GrowthStage.week6 }
 				);
 
 			//Add users
