@@ -12,6 +12,9 @@ using Azure.Storage.Blobs.Models;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
+using System.Net.Http;
+using Newtonsoft.Json;
+using static GreenHealth_API_backend.Models.Result;
 
 namespace GreenHealth_API_backend.Controllers
 {
@@ -22,13 +25,17 @@ namespace GreenHealth_API_backend.Controllers
     {
         private readonly DataContext _context;
         private readonly PlantService _plantService;
+        private readonly ResultService _resultService;
 		private string _blobConnectionString;
+        private string _apiConntectionString;
 
-		public PlantsController(DataContext context, PlantService service, IConfiguration configuration)
+        public PlantsController(DataContext context, PlantService service, ResultService resultService, IConfiguration configuration)
         {
             _context = context;
             _plantService = service;
-			_blobConnectionString = configuration.GetConnectionString("BlobConnection");
+            _resultService = resultService;
+            _blobConnectionString = configuration.GetConnectionString("BlobConnection");
+            _apiConntectionString = configuration.GetConnectionString("ApiConnection");
         }
 
         // GET: api/Plants
@@ -81,6 +88,61 @@ namespace GreenHealth_API_backend.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
 			}
 		}
+
+        // GET: api/Plants/5/Result
+        [HttpGet("{id}/result")]
+        public async Task<ActionResult<Result>> GetPlantResult(int id)
+        {
+            try
+            {
+                var plant = await _plantService.GetPlant(id);
+
+                if (plant.ImagePath == null && plant.Result == null)
+                {
+                    return NotFound();
+                }
+                else if (plant.ImagePath != null && plant.Result == null)
+                {
+                    string imageUrl = "https://storagemainfotosplanten.blob.core.windows.net/greenhealth/" + plant.ImagePath;
+                    string url = _apiConntectionString + "/?link=" + imageUrl;
+                    var httpClient = new HttpClient();
+                    var response = await httpClient.GetAsync(url);
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    AiResult jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
+
+                    Result putResult = new Result();
+                    putResult.Accuracy = Convert.ToDouble(jsonResult.accuracy);
+                    putResult.Stage = (GrowthStage)Convert.ToInt32(jsonResult.output);
+
+                    try
+                    {
+                        var resresult = await _resultService.PostResult(putResult);
+
+                        plant.Result = resresult;
+                        plant.ResultId = resresult.Id;
+
+                        return CreatedAtAction("GetResult", new { id = resresult.Id }, resresult);
+                    }
+                    catch (Exception)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Error posting data to the database");
+                    }
+                }
+                else if (plant.Result == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(plant.Result);
+                }    
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+            }
+        }
 
         // PUT: api/Plants/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
