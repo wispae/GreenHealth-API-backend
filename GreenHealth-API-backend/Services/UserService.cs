@@ -84,12 +84,12 @@ namespace GreenHealth_API_backend.Services
             return _context.User.Any(e => e.Id == id);
         }
 
-        public User Authenticate(string username, string password)
+        public (User user, string token) Authenticate(string username, string password)
         {
             var user = _context.User.SingleOrDefault(x => x.Email == username && x.Password == password);
             // return null if user not found
             if (user == null)
-                return null;
+                return (user, null);
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -103,11 +103,12 @@ namespace GreenHealth_API_backend.Services
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
+            var tokenHolder = tokenHandler.CreateToken(tokenDescriptor);
+			//user.Token = tokenHandler.WriteToken(token);
+			var token = tokenHandler.WriteToken(tokenHolder);
             // remove password before returning
             user.Password = null;
-            return user;
+            return new (user, token);
         }
     }
 }

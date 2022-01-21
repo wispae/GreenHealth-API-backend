@@ -16,8 +16,6 @@ namespace GreenHealth_API_backend.Models
 		public string Password { get; set; }
 		public bool IsAdmin { get; set; }
 		public ICollection<Plant> Plants { get; set; }
-		[NotMapped]
-		public string Token { get; set; }
 
 		public User()
 		{

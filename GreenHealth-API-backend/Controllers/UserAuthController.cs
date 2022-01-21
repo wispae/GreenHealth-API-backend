@@ -20,10 +20,10 @@ namespace GreenHealth_API_backend.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] User userParam)
         {
-            var user = _userService.Authenticate(userParam.Email, userParam.Password);
-            if (user == null)
+            var response = _userService.Authenticate(userParam.Email, userParam.Password);
+            if (response.user == null)
                 return BadRequest(new { message = "Email or password is incorrect" });
-            return Ok(user);
+            return Ok(new { user = response.user, token = response.token });
         }
     }
 }
