@@ -226,6 +226,10 @@ namespace GreenHealth_API_backend.Controllers
                     return NotFound();
                 }
 
+                BlobServiceClient blobServiceClient = new BlobServiceClient(_blobConnectionString);
+                BlobContainerClient cont = blobServiceClient.GetBlobContainerClient("greenhealth");
+                cont.GetBlobClient(plant.ImagePath).DeleteIfExists();
+
                 return NoContent();
             }
             catch (Exception)
