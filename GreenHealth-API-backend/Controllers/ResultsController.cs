@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GreenHealth_API_backend.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ResultsController : ControllerBase

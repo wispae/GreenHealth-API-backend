@@ -6,6 +6,7 @@ namespace GreenHealth_API_backend.Services
 {
     public interface IUserService
     {
+        (User user, string token) Authenticate(string username, string password);
         Task<User> DeleteUser(int id);
         Task<User> GetUser(int id);
         Task<IEnumerable<User>> GetUsers();

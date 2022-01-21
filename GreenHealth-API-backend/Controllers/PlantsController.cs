@@ -15,10 +15,12 @@ using GreenHealth_API_backend.Services;
 using System.Net.Http;
 using Newtonsoft.Json;
 using static GreenHealth_API_backend.Models.Result;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GreenHealth_API_backend.Controllers
 {
-	[Route("api/[controller]")]
+    [Authorize]
+    [Route("api/[controller]")]
 	[ApiController]
 
 	public class PlantsController : ControllerBase
