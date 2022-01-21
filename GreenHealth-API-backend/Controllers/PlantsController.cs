@@ -226,9 +226,8 @@ namespace GreenHealth_API_backend.Controllers
                     return NotFound();
                 }
 
-                BlobServiceClient blobServiceClient = new BlobServiceClient(_blobConnectionString);
-                BlobContainerClient cont = blobServiceClient.GetBlobContainerClient("greenhealth");
-                cont.GetBlobClient(plant.ImagePath).DeleteIfExists();
+				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", plant.ImagePath);
+				await blobClient.DeleteIfExistsAsync();
 
                 return NoContent();
             }
