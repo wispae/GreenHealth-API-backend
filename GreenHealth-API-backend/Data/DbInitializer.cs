@@ -19,17 +19,6 @@ namespace GreenHealth_API_backend.Data
 				return;   // DB has been seeded
 			}
 
-			// Add results
-
-			context.AddRange(
-				new Result { Accuracy = 92.6, Stage = GrowthStage.week1 },
-				new Result { Accuracy = 91.2, Stage = GrowthStage.week2 },
-				new Result { Accuracy = 87.98, Stage = GrowthStage.week3 },
-				new Result { Accuracy = 93, Stage = GrowthStage.week4 },
-				new Result { Accuracy = 997.009, Stage = GrowthStage.week5 },
-				new Result { Accuracy = 95.1, Stage = GrowthStage.week6 }
-				);
-
 			//Add users
 
 			context.AddRange(
@@ -45,37 +34,32 @@ namespace GreenHealth_API_backend.Data
 			Plant plant1 = new Plant()
 			{
 				UserId = 1,
-				ResultId = 1,
+				ImagePath = "u1p2.JPG"
 			};
 
 			Plant plant2 = new Plant()
 			{
-				UserId = 1,
-				ResultId = 2,
+				UserId = 1			
 			};
 
 			Plant plant3 = new Plant()
 			{
-				UserId = 2,
-				ResultId = 3,
+				UserId = 2			
 			};
 
 			Plant plant4 = new Plant()
 			{
-				UserId = 2,
-				ResultId = 4,
+				UserId = 2
 			};
 
 			Plant plant5 = new Plant()
 			{
-				UserId = 3,
-				ResultId = 5,
+				UserId = 3
 			};
 
 			Plant plant6 = new Plant()
 			{
-				UserId = 3,
-				ResultId = 6,
+				UserId = 3
 			};
 
 			context.Add(plant1);
@@ -84,6 +68,59 @@ namespace GreenHealth_API_backend.Data
 			context.Add(plant4);
 			context.Add(plant5);
 			context.Add(plant6);
+
+			context.SaveChanges();
+
+			// Add results
+
+			Result result1 = new Result()
+			{
+				Accuracy = 92.6,
+				GrowthStage = 1,
+				PlantId = 1
+			};
+
+			Result result2 = new Result()
+			{
+				Accuracy = 91.2,
+				GrowthStage = 2,
+				PlantId = 2
+			};
+
+			Result result3 = new Result()
+			{
+				Accuracy = 87.98,
+				GrowthStage = 3,
+				PlantId = 3
+			};
+
+			Result result4 = new Result()
+			{
+				Accuracy = 93,
+				GrowthStage = 4,
+				PlantId = 4
+			};
+
+			Result result5 = new Result()
+			{
+				Accuracy = 97.009,
+				GrowthStage = 5,
+				PlantId = 5
+			};
+
+			Result result6 = new Result()
+			{
+				Accuracy = 95.1,
+				GrowthStage = 6,
+				PlantId = 6
+			};
+
+			context.Add(result1);
+			context.Add(result2);
+			context.Add(result3);
+			context.Add(result4);
+			context.Add(result5);
+			context.Add(result6);
 
 			context.SaveChanges();
 
