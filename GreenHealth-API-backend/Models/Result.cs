@@ -11,8 +11,6 @@ namespace GreenHealth_API_backend.Models
 		[ForeignKey("Plant")]
 		public int Id { get; set; }
         public int GrowthStage { get; set; }
-		public Plant Plant { get; set; }
-		public int PlantId { get; set; }
 #nullable enable
 		public double? Accuracy { get; set; }
 #nullable disable

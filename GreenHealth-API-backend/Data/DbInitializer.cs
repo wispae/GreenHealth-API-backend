@@ -76,43 +76,37 @@ namespace GreenHealth_API_backend.Data
 			Result result1 = new Result()
 			{
 				Accuracy = 92.6,
-				GrowthStage = 1,
-				PlantId = 1
+				GrowthStage = 1
 			};
 
 			Result result2 = new Result()
 			{
 				Accuracy = 91.2,
-				GrowthStage = 2,
-				PlantId = 2
+				GrowthStage = 2
 			};
 
 			Result result3 = new Result()
 			{
 				Accuracy = 87.98,
-				GrowthStage = 3,
-				PlantId = 3
+				GrowthStage = 3
 			};
 
 			Result result4 = new Result()
 			{
 				Accuracy = 93,
-				GrowthStage = 4,
-				PlantId = 4
+				GrowthStage = 4
 			};
 
 			Result result5 = new Result()
 			{
 				Accuracy = 97.009,
-				GrowthStage = 5,
-				PlantId = 5
+				GrowthStage = 5
 			};
 
 			Result result6 = new Result()
 			{
 				Accuracy = 95.1,
-				GrowthStage = 6,
-				PlantId = 6
+				GrowthStage = 6
 			};
 
 			context.Add(result1);

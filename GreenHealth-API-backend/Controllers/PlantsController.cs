@@ -109,54 +109,33 @@ namespace GreenHealth_API_backend.Controllers
 
                 System.Diagnostics.Debug.WriteLine("We hebben een plantje");
 
-                if (plant.ImagePath == null && plant.Result == null)
+                if (plant.ImagePath == null && plant.ResultId == null)
                 {
                     return NotFound();
                 }
-                else if (plant.ImagePath != null && plant.Result == null)
+                else if (plant.ImagePath != null && plant.ResultId == null)
                 {
                     string imageUrl = "https://storagemainfotosplanten.blob.core.windows.net/greenhealth/" + plant.ImagePath;
                     string url = _apiConntectionString + imageUrl;
-                    System.Diagnostics.Debug.WriteLine("De url is: " + url);
 
-                    String result;
+                    var httpClient = new HttpClient();
+                    var response = await httpClient.GetAsync(url);
+                    String result = await response.Content.ReadAsStringAsync();
 
-                    try
-                    {
-                        var httpClient = new HttpClient();
-                        var response = await httpClient.GetAsync(url);
-                        result = await response.Content.ReadAsStringAsync();
-                        System.Diagnostics.Debug.WriteLine("De result is: " + result);
-                    }
-                    catch (Exception)
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Geen idee wat er hier gebeurd is");
-                    }
-
-                    AiResult jsonResult;
-
-                    try
-                    {
-                        jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
-                    }
-                    catch (Exception)
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Jup we're fucked");
-                    }
+                    AiResult jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
 
                     Result putResult = new Result();
                     putResult.Accuracy = jsonResult.accuracy;
                     putResult.GrowthStage = jsonResult.output;
-                    System.Diagnostics.Debug.WriteLine("Putresult is: " + putResult.Accuracy + " " + putResult.GrowthStage);
 
                     try
                     {
-                        var resresult = await _resultService.PostResult(putResult);
+                        plant.Result = putResult;
+                        var plantresult = await _plantService.PutPlant(plant.Id, plant);
 
-                        //plant.Result = putResult;
-                        //var plantresult = await _plantService.PutPlant(plant.Id, plant);
+                        var resresult = plantresult.Result;
 
-                        return CreatedAtAction("GetResult", new { id = resresult.Id }, resresult);
+                        return CreatedAtAction("GetResult", "Results", new { id = resresult.Id }, resresult);
                     }
                     catch (Exception)
                     {
