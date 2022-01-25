@@ -7,7 +7,7 @@ namespace GreenHealth_API_backend.Models
 {
     public class AiResult
     {
-        public string accuracy { get; set; }
-        public string output { get; set; }
+        public float accuracy { get; set; }
+        public int output { get; set; }
     }
 }

@@ -95,7 +95,17 @@ namespace GreenHealth_API_backend.Controllers
         {
             try
             {
-                var plant = await _plantService.GetPlant(id);
+                Plant plant;
+                try
+                {
+                    plant = await _plantService.GetPlant(id);
+                }
+                catch (Exception)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+                }
+
+                System.Diagnostics.Debug.WriteLine("We hebben een plantje");
 
                 if (plant.ImagePath == null && plant.Result == null)
                 {
@@ -104,23 +114,45 @@ namespace GreenHealth_API_backend.Controllers
                 else if (plant.ImagePath != null && plant.Result == null)
                 {
                     string imageUrl = "https://storagemainfotosplanten.blob.core.windows.net/greenhealth/" + plant.ImagePath;
-                    string url = _apiConntectionString + "/?link=" + imageUrl;
-                    var httpClient = new HttpClient();
-                    var response = await httpClient.GetAsync(url);
-                    var result = await response.Content.ReadAsStringAsync();
+                    string url = _apiConntectionString + imageUrl;
+                    System.Diagnostics.Debug.WriteLine("De url is: " + url);
 
-                    AiResult jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
+                    String result;
+
+                    try
+                    {
+                        var httpClient = new HttpClient();
+                        var response = await httpClient.GetAsync(url);
+                        result = await response.Content.ReadAsStringAsync();
+                        System.Diagnostics.Debug.WriteLine("De result is: " + result);
+                    }
+                    catch (Exception)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Geen idee wat er hier gebeurd is");
+                    }
+
+                    AiResult jsonResult;
+
+                    try
+                    {
+                        jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
+                    }
+                    catch (Exception)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Jup we're fucked");
+                    }
 
                     Result putResult = new Result();
-                    putResult.Accuracy = Convert.ToDouble(jsonResult.accuracy);
-                    putResult.Stage = (GrowthStage)Convert.ToInt32(jsonResult.output);
+                    putResult.Accuracy = jsonResult.accuracy;
+                    putResult.GrowthStage = jsonResult.output;
+                    System.Diagnostics.Debug.WriteLine("Putresult is: " + putResult.Accuracy + " " + putResult.GrowthStage);
 
                     try
                     {
                         var resresult = await _resultService.PostResult(putResult);
 
-                        plant.Result = resresult;
-                        plant.ResultId = resresult.Id;
+                        //plant.Result = putResult;
+                        //var plantresult = await _plantService.PutPlant(plant.Id, plant);
 
                         return CreatedAtAction("GetResult", new { id = resresult.Id }, resresult);
                     }
