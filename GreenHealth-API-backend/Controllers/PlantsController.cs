@@ -219,6 +219,7 @@ namespace GreenHealth_API_backend.Controllers
         {
             try
             {
+				plant.Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ+1");
                 var plantresult = await _plantService.PostPlant(plant);
                 return CreatedAtAction("GetPlant", new { id = plantresult.Id }, plantresult);
             }
