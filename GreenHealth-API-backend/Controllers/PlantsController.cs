@@ -122,11 +122,12 @@ namespace GreenHealth_API_backend.Controllers
                     var response = await httpClient.GetAsync(url);
                     String result = await response.Content.ReadAsStringAsync();
 
-                    AiResult jsonResult = JsonConvert.DeserializeObject<AiResult>(result);
+                    IAiResult jsonResult = JsonConvert.DeserializeObject<IAiResult>(result);
 
                     Result putResult = new Result();
-                    putResult.Accuracy = jsonResult.accuracy;
-                    putResult.GrowthStage = jsonResult.output;
+                    putResult.Accuracy = jsonResult.Accuracy;
+                    putResult.GrowthStage = jsonResult.Output;
+					putResult.Species = jsonResult.Species;
 
                     try
                     {
@@ -218,6 +219,7 @@ namespace GreenHealth_API_backend.Controllers
         {
             try
             {
+				plant.Timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ+1");
                 var plantresult = await _plantService.PostPlant(plant);
                 return CreatedAtAction("GetPlant", new { id = plantresult.Id }, plantresult);
             }

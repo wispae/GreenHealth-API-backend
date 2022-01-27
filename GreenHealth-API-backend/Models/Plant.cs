@@ -14,6 +14,7 @@ namespace GreenHealth_API_backend.Models
 		public Result? Result { get; set; }
 		public int? ResultId { get; set; }
 		public string? Location { get; set; }
+		public string? Timestamp { get; set; }
 #nullable disable
 		public string ImagePath { get; set; }
 	}
