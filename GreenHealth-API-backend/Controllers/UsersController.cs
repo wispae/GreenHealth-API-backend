@@ -54,6 +54,28 @@ namespace GreenHealth_API_backend.Controllers
             }
         }
 
+		[HttpGet("{id}/plants")]
+		public async Task<ActionResult<Plant[]>> GetUserPlants(int id)
+		{
+			try
+			{
+				var user = await _userService.GetUserWithPlants(id);
+
+				if (user == null)
+				{
+					return NotFound();
+				}
+
+				user.Plants.AsParallel().ForAll(p => p.User = null);
+
+				return Ok(user.Plants);
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+		}
+
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace GreenHealth_API_backend.Services
 {
@@ -34,6 +35,11 @@ namespace GreenHealth_API_backend.Services
         {
             return await _context.User.FindAsync(id);
         }
+
+		public async Task<User> GetUserWithPlants(int id)
+		{
+			return await _context.User.Include(u => u.Plants).SingleOrDefaultAsync(u => u.Id == id);
+		}
 
         public async Task<User> PutUser(int id, User user)
         {
@@ -59,6 +65,9 @@ namespace GreenHealth_API_backend.Services
 
         public async Task<User> PostUser(User user)
         {
+			HashAlgorithm hashAlgorithm = SHA256.Create();
+			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
+			user.Password = Encoding.UTF8.GetString(hashAlgorithm.Hash);
             _context.User.Add(user);
             await _context.SaveChangesAsync();
             return user;
@@ -86,7 +95,9 @@ namespace GreenHealth_API_backend.Services
 
         public (User user, string token) Authenticate(string username, string password)
         {
-            var user = _context.User.SingleOrDefault(x => x.Email == username && x.Password == password);
+			HashAlgorithm hashAlgorithm = SHA256.Create();
+			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
+			var user = _context.User.SingleOrDefault(x => x.Email == username && x.Password == Encoding.UTF8.GetString(hashAlgorithm.Hash));
             // return null if user not found
             if (user == null)
                 return (user, null);

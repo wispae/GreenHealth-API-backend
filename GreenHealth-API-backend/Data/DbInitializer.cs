@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 using GreenHealth_API_backend.Models;
 using static GreenHealth_API_backend.Models.Result;
+using System.Text;
 
 namespace GreenHealth_API_backend.Data
 {
@@ -20,11 +22,42 @@ namespace GreenHealth_API_backend.Data
 			}
 
 			//Add users
+			HashAlgorithm hashAlgorithm = SHA256.Create();
+
+			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes("Brent1234"));
+			string bHash = Encoding.UTF8.GetString(hashAlgorithm.Hash);
+
+			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes("Toon1234"));
+			string tHash = Encoding.UTF8.GetString(hashAlgorithm.Hash);
+
+			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes("Wilfer1234"));
+			string wHash = Encoding.UTF8.GetString(hashAlgorithm.Hash);
 
 			context.AddRange(
-				new User { FirstName = "Brent", LastName = "Van de Staey", Email = "brent@vandestaey.be", Password = "Brent1234", IsAdmin = true },
-				new User { FirstName = "Toon", LastName = "De Bie", Email = "toon@debie.be", Password = "Toon1234", IsAdmin = false },
-				new User { FirstName = "Wilfer", LastName = "Spaepen", Email = "Wilfer@spaepen.be", Password = "Wilfer1234", IsAdmin = false }
+				new User
+				{
+					FirstName = "Brent",
+					LastName = "Van de Staey",
+					Email = "brent@vandestaey.be",
+					Password = bHash,
+					IsAdmin = true
+				},
+				new User
+				{
+					FirstName = "Toon",
+					LastName = "De Bie",
+					Email = "toon@debie.be",
+					Password = tHash,
+					IsAdmin = false
+				},
+				new User
+				{
+					FirstName = "Wilfer",
+					LastName = "Spaepen",
+					Email = "Wilfer@spaepen.be",
+					Password = wHash,
+					IsAdmin = false
+				}
 				);
 
 			context.SaveChanges();

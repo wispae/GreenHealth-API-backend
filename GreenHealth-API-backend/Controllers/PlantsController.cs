@@ -107,8 +107,6 @@ namespace GreenHealth_API_backend.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
                 }
 
-                System.Diagnostics.Debug.WriteLine("We hebben een plantje");
-
                 if (plant.ImagePath == null && plant.ResultId == null)
                 {
                     return NotFound();
