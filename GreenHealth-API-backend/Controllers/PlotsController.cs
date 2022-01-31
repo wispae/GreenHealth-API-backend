@@ -50,6 +50,7 @@ namespace GreenHealth_API_backend.Controllers
 				{
 					return NotFound();
 				}
+				plots.AsParallel().ForAll(p => { p.Organisation.Plots = null; p.Organisation.Users = null; });
 				return Ok(plots);
 			}
 			catch (Exception)

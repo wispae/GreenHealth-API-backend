@@ -40,7 +40,8 @@ namespace GreenHealth_API_backend.Data
 					LastName = "De Bie",
 					Email = "toon@debie.be",
 					Password = tHash,
-					IsAdmin = false
+					IsAdmin = false,
+					IsOwner = true
 				}
 				);
 
@@ -49,7 +50,6 @@ namespace GreenHealth_API_backend.Data
 			context.Add(
 				new Organisation
 				{
-					OwnerId = context.User.Single(u => u.FirstName == "Toon").Id,
 					Name = "Green Health"
 				}
 			);

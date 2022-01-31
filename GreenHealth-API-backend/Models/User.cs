@@ -15,6 +15,7 @@ namespace GreenHealth_API_backend.Models
 		public string Address { get; set; }
 		public string Password { get; set; }
 		public bool IsAdmin { get; set; }
+		public bool IsOwner { get; set; }
 #nullable enable
 		public int? OrganisationId { get; set; }
 		public Organisation? Organisation { get; set; }
@@ -29,6 +30,7 @@ namespace GreenHealth_API_backend.Models
 			Address = "";
 			Password = "";
 			IsAdmin = false;
+			IsOwner = false;
 		}
 	}
 }
