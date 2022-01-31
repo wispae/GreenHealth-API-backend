@@ -17,9 +17,14 @@ namespace GreenHealth_API_backend.Services
 			_context = context;
 		}
 
-		public async Task<IEnumerable<Plot>> GetPlots()
+		public async Task<IEnumerable<Plot>> GetPlots(int id)
 		{
-			return await _context.Plot.ToListAsync();
+			var user = await _context.User.Include(x => x.Organisation).ThenInclude(x => x.Plots).FirstOrDefaultAsync(x => x.Id == id);
+			if(user == null)
+			{
+				return null;
+			}
+			return user.Organisation.Plots;
 		}
 
 		public async Task<Plot> GetPlot(int id)

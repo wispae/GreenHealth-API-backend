@@ -32,7 +32,30 @@ namespace GreenHealth_API_backend.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Plot>>> GetPlots()
 		{
-			return Ok(await _plotService.GetPlots());
+			var result = new JsonResult(from c in User.Claims
+										select new
+										{
+											c.Type,
+											c.Value
+										});
+			var userClaimId = User.Claims.Single(c => c.Type == "Id").Value;
+			if (userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
+			try
+			{
+				var plots = await _plotService.GetPlots(int.Parse(userClaimId));
+				if (plots == null)
+				{
+					return NotFound();
+				}
+				return Ok(plots);
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
 		}
 
 		// GET: api/Plots/5

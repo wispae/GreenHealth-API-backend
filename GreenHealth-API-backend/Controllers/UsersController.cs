@@ -35,7 +35,7 @@ namespace GreenHealth_API_backend.Controllers
         }
 
 		[HttpGet("currentUser")]
-		public async Task<ActionResult<string>> GetCurrentUser()
+		public async Task<ActionResult<User>> GetCurrentUser()
 		{
 			
 			var result = new JsonResult(from c in User.Claims select new
@@ -55,7 +55,6 @@ namespace GreenHealth_API_backend.Controllers
 				{
 					return NotFound();
 				}
-				user.Password = null;
 				return Ok(user);
 			}
 			catch (Exception)
