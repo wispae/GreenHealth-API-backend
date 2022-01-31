@@ -48,6 +48,9 @@ namespace GreenHealth_API_backend
 			services.AddScoped<PlantService>();
 			services.AddScoped<UserService>();
 			services.AddScoped<ResultService>();
+			services.AddScoped<OrganisationService>();
+			services.AddScoped<PlotService>();
+			services.AddScoped<SeasonService>();
 
 			services.AddCors(opt =>
 			{

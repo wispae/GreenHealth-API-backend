@@ -9,6 +9,7 @@ using GreenHealth_API_backend.Data;
 using GreenHealth_API_backend.Models;
 using GreenHealth_API_backend.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace GreenHealth_API_backend.Controllers
 {
@@ -33,6 +34,36 @@ namespace GreenHealth_API_backend.Controllers
             return Ok(await _userService.GetUsers());
         }
 
+		[HttpGet("currentUser")]
+		public async Task<ActionResult<string>> GetCurrentUser()
+		{
+			
+			var result = new JsonResult(from c in User.Claims select new
+			{
+				c.Type,
+				c.Value
+			});
+			var userClaimId =  User.Claims.Single(c => c.Type == "Id").Value;
+			if(userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
+			try
+			{
+				var user = await _userService.GetUser(int.Parse(userClaimId));
+				if(user == null)
+				{
+					return NotFound();
+				}
+				user.Password = null;
+				return Ok(user);
+			}
+			catch (Exception)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+		}
+
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
@@ -53,28 +84,6 @@ namespace GreenHealth_API_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
             }
         }
-
-		[HttpGet("{id}/plants")]
-		public async Task<ActionResult<Plant[]>> GetUserPlants(int id)
-		{
-			try
-			{
-				var user = await _userService.GetUserWithPlants(id);
-
-				if (user == null)
-				{
-					return NotFound();
-				}
-
-				user.Plants.AsParallel().ForAll(p => p.User = null);
-
-				return Ok(user.Plants);
-			}
-			catch (Exception)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
-			}
-		}
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
