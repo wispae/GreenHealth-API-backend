@@ -15,6 +15,7 @@ namespace GreenHealth_API_backend.Models
 		public string? StartDate { get; set; }
 		public string? EndDate { get; set; }
 #nullable disable
+		[InverseProperty("Season")]
 		public ICollection<Plant> Plants { get; set; }
 	}
 }

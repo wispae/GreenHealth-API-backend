@@ -36,6 +36,32 @@ namespace GreenHealth_API_backend.Data
 			context.AddRange(
 				new User
 				{
+					FirstName = "Toon",
+					LastName = "De Bie",
+					Email = "toon@debie.be",
+					Password = tHash,
+					IsAdmin = false
+				}
+				);
+
+			context.SaveChanges();
+
+			context.Add(
+				new Organisation
+				{
+					OwnerId = context.User.Single(u => u.FirstName == "Toon").Id,
+					Name = "Green Health"
+				}
+			);
+
+			context.SaveChanges();
+
+			context.User.Find(1).OrganisationId = 1;
+
+			context.AddRange(
+				new User
+				{
+					OrganisationId = 1,
 					FirstName = "Brent",
 					LastName = "Van de Staey",
 					Email = "brent@vandestaey.be",
@@ -44,19 +70,21 @@ namespace GreenHealth_API_backend.Data
 				},
 				new User
 				{
-					FirstName = "Toon",
-					LastName = "De Bie",
-					Email = "toon@debie.be",
-					Password = tHash,
-					IsAdmin = false
-				},
-				new User
-				{
+					OrganisationId = 1,
 					FirstName = "Wilfer",
 					LastName = "Spaepen",
 					Email = "Wilfer@spaepen.be",
 					Password = wHash,
 					IsAdmin = false
+				});
+
+			context.SaveChanges();
+
+			context.AddRange(
+				new Plot
+				{
+					OrganisationId = context.Organisation.Single(o => o.Name == "Green Health").Id,
+					Location = "De Campus"
 				}
 				);
 
@@ -66,88 +94,23 @@ namespace GreenHealth_API_backend.Data
 
 			Plant plant1 = new Plant()
 			{
-				UserId = 1,
+				PlotId = 1,
 				ImagePath = "u1p2.JPG"
 			};
 
 			Plant plant2 = new Plant()
 			{
-				UserId = 1			
+				PlotId = 1
 			};
 
 			Plant plant3 = new Plant()
 			{
-				UserId = 2			
-			};
-
-			Plant plant4 = new Plant()
-			{
-				UserId = 2
-			};
-
-			Plant plant5 = new Plant()
-			{
-				UserId = 3
-			};
-
-			Plant plant6 = new Plant()
-			{
-				UserId = 3
+				PlotId = 1
 			};
 
 			context.Add(plant1);
 			context.Add(plant2);
 			context.Add(plant3);
-			context.Add(plant4);
-			context.Add(plant5);
-			context.Add(plant6);
-
-			context.SaveChanges();
-
-			// Add results
-
-			Result result1 = new Result()
-			{
-				Accuracy = 92.6,
-				GrowthStage = 1
-			};
-
-			Result result2 = new Result()
-			{
-				Accuracy = 91.2,
-				GrowthStage = 2
-			};
-
-			Result result3 = new Result()
-			{
-				Accuracy = 87.98,
-				GrowthStage = 3
-			};
-
-			Result result4 = new Result()
-			{
-				Accuracy = 93,
-				GrowthStage = 4
-			};
-
-			Result result5 = new Result()
-			{
-				Accuracy = 97.009,
-				GrowthStage = 5
-			};
-
-			Result result6 = new Result()
-			{
-				Accuracy = 95.1,
-				GrowthStage = 6
-			};
-
-			context.Add(result1);
-			context.Add(result2);
-			context.Add(result3);
-			context.Add(result4);
-			context.Add(result5);
-			context.Add(result6);
 
 			context.SaveChanges();
 

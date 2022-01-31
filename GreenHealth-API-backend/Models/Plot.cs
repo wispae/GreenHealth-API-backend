@@ -14,6 +14,7 @@ namespace GreenHealth_API_backend.Models
 		public string Location { get; set; }
 
 		public Organisation Organisation { get; set; }
+		[InverseProperty("Plot")]
 		public ICollection<Plant> Plant { get; set; }
 	}
 }

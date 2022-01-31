@@ -16,7 +16,7 @@ namespace GreenHealth_API_backend.Models
 		public string Password { get; set; }
 		public bool IsAdmin { get; set; }
 #nullable enable
-		public int OrganisationId { get; set; }
+		public int? OrganisationId { get; set; }
 		public Organisation? Organisation { get; set; }
 
 #nullable disable
