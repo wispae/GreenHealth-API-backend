@@ -36,6 +36,11 @@ namespace GreenHealth_API_backend.Services
             return await _context.User.FindAsync(id);
         }
 
+		public async Task<User> GetUserWithOrganisation(int id)
+		{
+			return await _context.User.Include(u => u.Organisation).FirstOrDefaultAsync(u => u.Id == id);
+		}
+
         public async Task<User> PutUser(int id, User user)
         {
             _context.Entry(user).State = EntityState.Modified;
