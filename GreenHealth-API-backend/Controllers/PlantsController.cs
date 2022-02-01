@@ -189,32 +189,36 @@ namespace GreenHealth_API_backend.Controllers
 			try
 			{
 				var plantResult = await _plantService.GetPlant(id);
-
-				if(plantResult == null)
+				if (plantResult == null)
 				{
 					return NotFound();
 				}
 
 				string imageName = "p" + plantResult.PlotId.ToString() + "p" + plantResult.Id + ".JPG";
 				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", imageName);
-				Stream imageStream = image.OpenReadStream();
-				imageStream.Position = 0;
-				await blobClient.UploadAsync(imageStream);
+
+				await using (var imageStream = image.OpenReadStream())
+				{
+					await using var memoryStream = new MemoryStream();
+					imageStream.Seek(0, SeekOrigin.Begin);
+					await imageStream.CopyToAsync(memoryStream).ConfigureAwait(false);
+					await blobClient.UploadAsync(memoryStream);
+				}
 
 				plantResult.ImagePath = imageName;
 
 				await _plantService.PutPlant(id, plantResult);
 				return Ok(plantResult);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database" + ex);
 			}
 		}
 
-        // POST: api/Plants
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+		// POST: api/Plants
+		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+		[HttpPost]
         public async Task<ActionResult<Plant>> PostPlant(Plant plant)
         {
             try
