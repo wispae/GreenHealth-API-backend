@@ -10,7 +10,7 @@ namespace GreenHealth_API_backend.Services
 	{
 		Task<Plot> GetPlot(int id);
 		Task<Plot> PutPlot(int id, Plot plot);
-		Task<Plot> PostPlot(Plot plot);
+		Task<Plot> PostPlot(Plot plot, int userId);
 		Task<Plot> DeletePlot(int id);
 		Task<IEnumerable<Plot>> GetPlots(int id);
 	}
