@@ -197,7 +197,9 @@ namespace GreenHealth_API_backend.Controllers
 
 				string imageName = "p" + plantResult.PlotId.ToString() + "p" + plantResult.Id + ".JPG";
 				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", imageName);
-				await blobClient.UploadAsync(image.OpenReadStream());
+				Stream imageStream = image.OpenReadStream();
+				imageStream.Position = 0;
+				await blobClient.UploadAsync(imageStream);
 
 				plantResult.ImagePath = imageName;
 
