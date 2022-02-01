@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -186,6 +187,8 @@ namespace GreenHealth_API_backend.Controllers
 		[HttpPatch("{id}/image")]
 		public async Task<ActionResult<Plant>> PatchPlant(int id, IFormFile image)
 		{
+			StringBuilder additionalLogging = new($"Id: {id}, imageFile is null: {image == null}\n");
+
 			try
 			{
 				var plantResult = await _plantService.GetPlant(id);
@@ -194,14 +197,16 @@ namespace GreenHealth_API_backend.Controllers
 					return NotFound();
 				}
 
+				additionalLogging.AppendLine($"PlotId: {plantResult.PlotId}, Id: {plantResult.Id}");
+
 				string imageName = "p" + plantResult.PlotId.ToString() + "p" + plantResult.Id + ".JPG";
 				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", imageName);
 
-				await using (var imageStream = image.OpenReadStream())
+				await using (var memoryStream = new MemoryStream())
 				{
-					await using var memoryStream = new MemoryStream();
-					imageStream.Seek(0, SeekOrigin.Begin);
-					await imageStream.CopyToAsync(memoryStream).ConfigureAwait(false);
+					await image!.CopyToAsync(memoryStream).ConfigureAwait(false);
+					memoryStream.Seek(0, SeekOrigin.Begin);
+
 					await blobClient.UploadAsync(memoryStream);
 				}
 
@@ -212,7 +217,7 @@ namespace GreenHealth_API_backend.Controllers
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database" + ex);
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database\n" + additionalLogging + "\n" + ex);
 			}
 		}
 
