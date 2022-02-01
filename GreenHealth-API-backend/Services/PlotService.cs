@@ -54,8 +54,16 @@ namespace GreenHealth_API_backend.Services
 			}
 		}
 
-		public async Task<Plot> PostPlot(Plot plot)
+		public async Task<Plot> PostPlot(Plot plot, int uid)
 		{
+			var user = _context.User.Find(uid);
+			if(user == null)
+			{
+				return null;
+			} else if(user.OrganisationId == null) {
+				return null;
+			}
+			plot.OrganisationId = (int)user.OrganisationId;
 			_context.Plot.Add(plot);
 			await _context.SaveChangesAsync();
 			return plot;

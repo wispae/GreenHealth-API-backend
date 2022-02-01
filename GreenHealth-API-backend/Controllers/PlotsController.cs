@@ -111,9 +111,24 @@ namespace GreenHealth_API_backend.Controllers
 		[HttpPost]
 		public async Task<ActionResult<Plot>> PostPlot(Plot plot)
 		{
+			var result = new JsonResult(from c in User.Claims
+										select new
+										{
+											c.Type,
+											c.Value
+										});
+			var userClaimId = User.Claims.Single(c => c.Type == "Id").Value;
+			if (userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
 			try
 			{
-				var plotresult = await _plotService.PostPlot(plot);
+				var plotresult = await _plotService.PostPlot(plot, int.Parse(userClaimId));
+				if(plotresult == null)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, "Error posting data to the database");
+				}
 				return CreatedAtAction("GetPlot", new { id = plotresult.Id }, plotresult);
 			}
 			catch (Exception)
