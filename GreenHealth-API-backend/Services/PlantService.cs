@@ -17,9 +17,32 @@ namespace GreenHealth_API_backend.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Plant>> GetPlants()
+        public async Task<IEnumerable<Plant>> GetPlants(int id)
         {
-            return await _context.Plant.ToListAsync();
+			var user = await _context.User.FindAsync(id);
+			if(user == null || user.OrganisationId == null)
+			{
+				return null;
+			}
+			
+			var organisation = await _context.Organisation
+				.Include(x => x.Plots)
+				.ThenInclude(x => x.Plants)
+				.SingleOrDefaultAsync(x => x.Id == user.OrganisationId );
+			
+			if(organisation == null)
+			{
+				return null;
+			}
+
+			List<Plant> plantList = new List<Plant>();
+			foreach (Plot p in organisation.Plots)
+			{
+				plantList.AddRange(p.Plants);
+			}
+
+			return plantList;
+
         }
 
         public async Task<Plant> GetPlant(int id)

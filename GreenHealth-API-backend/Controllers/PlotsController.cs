@@ -59,6 +59,29 @@ namespace GreenHealth_API_backend.Controllers
 			}
 		}
 
+		// GET: api/Plots/5/Plants
+		[HttpGet("{id}/Plants")]
+		public async Task<ActionResult<IEnumerable<Plant>>> GetPlotPlants(int id)
+		{
+			var result = new JsonResult(from c in User.Claims
+										select new
+										{
+											c.Type,
+											c.Value
+										});
+			var userClaimId = User.Claims.Single(c => c.Type == "Id").Value;
+			if (userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
+
+			var plantList = await _plotService.GetPlotPlants(int.Parse(userClaimId), id);
+
+			plantList.AsParallel().ForAll(x => x.Plot = null);
+
+			return Ok(plantList);
+		}
+
 		// GET: api/Plots/5
 		[HttpGet("{id}")]
 		public async Task<ActionResult<Plot>> GetPlot(int id)

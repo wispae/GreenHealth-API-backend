@@ -45,7 +45,26 @@ namespace GreenHealth_API_backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Plant>>> GetPlant()
         {
-            return Ok(await _plantService.GetPlants());
+			var result = new JsonResult(from c in User.Claims
+										select new
+										{
+											c.Type,
+											c.Value
+										});
+			var userClaimId = User.Claims.Single(c => c.Type == "Id").Value;
+			if (userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
+			var plantList = await _plantService.GetPlants(int.Parse(userClaimId));
+			if(plantList == null)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+
+			plantList.AsParallel().ForAll(x => x.Plot = null);
+
+			return Ok(plantList);
         }
 
         // GET: api/Plants/5
@@ -127,6 +146,7 @@ namespace GreenHealth_API_backend.Controllers
                     putResult.Accuracy = jsonResult.Accuracy;
                     putResult.GrowthStage = jsonResult.Output;
 					putResult.Species = jsonResult.Species;
+					putResult.Kind = jsonResult.Kind;
 
                     try
                     {
@@ -187,8 +207,6 @@ namespace GreenHealth_API_backend.Controllers
 		[HttpPatch("{id}/image")]
 		public async Task<ActionResult<Plant>> PatchPlant(int id, IFormFile image)
 		{
-			StringBuilder additionalLogging = new($"Id: {id}, imageFile is null: {image == null}\n");
-
 			try
 			{
 				var plantResult = await _plantService.GetPlant(id);
@@ -196,8 +214,6 @@ namespace GreenHealth_API_backend.Controllers
 				{
 					return NotFound();
 				}
-
-				additionalLogging.AppendLine($"PlotId: {plantResult.PlotId}, Id: {plantResult.Id}");
 
 				string imageName = "p" + plantResult.PlotId.ToString() + "p" + plantResult.Id + ".JPG";
 				BlobClient blobClient = new BlobClient(_blobConnectionString, "greenhealth", imageName);
@@ -215,9 +231,9 @@ namespace GreenHealth_API_backend.Controllers
 				await _plantService.PutPlant(id, plantResult);
 				return Ok(plantResult);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database\n" + additionalLogging + "\n" + ex);
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
 			}
 		}
 

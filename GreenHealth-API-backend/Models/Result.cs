@@ -16,6 +16,7 @@ namespace GreenHealth_API_backend.Models
 		public int? CorrectedGrowthStage { get; set; }
 		public string? Species { get; set; }
 		public string? CorrectedSpecies { get; set; }
+		public string? Kind { get; set; }
 #nullable disable
 	}
 }

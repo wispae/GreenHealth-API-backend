@@ -10,5 +10,6 @@ namespace GreenHealth_API_backend.Models
         public float Accuracy { get; set; }
         public int Output { get; set; }
 		public string Species { get; set; }
+		public string Kind { get; set; }
     }
 }

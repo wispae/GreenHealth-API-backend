@@ -8,7 +8,7 @@ namespace GreenHealth_API_backend.Services
     {
         Task<Plant> DeletePlant(int id);
         Task<Plant> GetPlant(int id);
-        Task<IEnumerable<Plant>> GetPlants();
+        Task<IEnumerable<Plant>> GetPlants(int id);
         Task<Plant> PostPlant(Plant plant);
         Task<Plant> PutPlant(int id, Plant plant);
     }
