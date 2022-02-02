@@ -45,7 +45,26 @@ namespace GreenHealth_API_backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Plant>>> GetPlant()
         {
-            return Ok(await _plantService.GetPlants());
+			var result = new JsonResult(from c in User.Claims
+										select new
+										{
+											c.Type,
+											c.Value
+										});
+			var userClaimId = User.Claims.Single(c => c.Type == "Id").Value;
+			if (userClaimId == null || userClaimId == "")
+			{
+				return StatusCode(StatusCodes.Status401Unauthorized, "You are not logged in");
+			}
+			var plantList = await _plantService.GetPlants(int.Parse(userClaimId));
+			if(plantList == null)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
+			}
+
+			plantList.AsParallel().ForAll(x => x.Plot = null);
+
+			return Ok(plantList);
         }
 
         // GET: api/Plants/5
