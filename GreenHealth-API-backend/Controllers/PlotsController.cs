@@ -77,7 +77,7 @@ namespace GreenHealth_API_backend.Controllers
 
 			var plantList = await _plotService.GetPlotPlants(int.Parse(userClaimId), id);
 
-			plantList.AsParallel().ForAll(x => x.Plot = null);
+			plantList.AsParallel().ForAll(x => { x.Plot = null; });
 
 			return Ok(plantList);
 		}
