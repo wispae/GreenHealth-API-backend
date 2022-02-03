@@ -45,6 +45,7 @@ namespace GreenHealth_API_backend.Services
 
 			var plot = await _context.Plot
 				.Include(x => x.Plants)
+				.ThenInclude(x => x.Result)
 				.FirstOrDefaultAsync(x => x.Id == pid);
 			if(plot == null || plot.OrganisationId != user.OrganisationId)
 			{
