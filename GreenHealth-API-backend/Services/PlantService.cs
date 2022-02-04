@@ -47,7 +47,13 @@ namespace GreenHealth_API_backend.Services
 
         public async Task<Plant> GetPlant(int id)
         {
-            return await _context.Plant.FindAsync(id);
+            var plant = await _context.Plant.Include(x => x.Result).FirstOrDefaultAsync(x => x.Id == id);
+			if(plant == null)
+			{
+				return null;
+			}
+
+			return plant;
         }
 
         public async Task<Plant> PutPlant(int id, Plant plant)
