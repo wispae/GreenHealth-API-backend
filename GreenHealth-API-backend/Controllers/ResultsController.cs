@@ -57,7 +57,7 @@ namespace GreenHealth_API_backend.Controllers
         // PUT: api/Results/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutResult(int id, Result result)
+        public async Task<ActionResult<Result>> PutResult(int id, Result result)
         {
             if (id != result.Id)
             {
@@ -72,7 +72,7 @@ namespace GreenHealth_API_backend.Controllers
                     return NotFound();
                 }
 
-                return NoContent();
+				return resresult;
             }
             catch (Exception)
             {
