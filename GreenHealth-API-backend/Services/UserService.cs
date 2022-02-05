@@ -28,12 +28,17 @@ namespace GreenHealth_API_backend.Services
 
         public async Task<IEnumerable<User>> GetUsers()
         {
-            return await _context.User.ToListAsync();
+            var userList = await _context.User.ToListAsync();
+			userList.ForEach(x => x.Password = "");
+			return userList;
         }
 
         public async Task<User> GetUser(int id)
         {
-            return await _context.User.FindAsync(id);
+            var user = await _context.User.FindAsync(id);
+			if (user == null) return null;
+			user.Password = "";
+			return user;
         }
 
 		public async Task<User> GetUserWithOrganisation(int id)
@@ -48,6 +53,7 @@ namespace GreenHealth_API_backend.Services
             try
             {
                 await _context.SaveChangesAsync();
+				user.Password = "";
                 return user;
             }
             catch (DbUpdateConcurrencyException)
@@ -85,6 +91,7 @@ namespace GreenHealth_API_backend.Services
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
 
+			user.Password = "";
             return user;
         }
 
@@ -97,7 +104,8 @@ namespace GreenHealth_API_backend.Services
         {
 			HashAlgorithm hashAlgorithm = SHA256.Create();
 			hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(password));
-			var user = _context.User.SingleOrDefault(x => x.Email == username && x.Password == Encoding.UTF8.GetString(hashAlgorithm.Hash));
+			string userPassword = Encoding.UTF8.GetString(hashAlgorithm.Hash);
+			var user = _context.User.SingleOrDefault(x => x.Email == username && x.Password == userPassword);
             // return null if user not found
             if (user == null)
                 return (user, null);

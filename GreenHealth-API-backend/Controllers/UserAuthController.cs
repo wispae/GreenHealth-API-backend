@@ -25,5 +25,25 @@ namespace GreenHealth_API_backend.Controllers
                 return BadRequest(new { message = "Email or password is incorrect" });
             return Ok(new { user = response.user, token = response.token });
         }
+
+		[HttpPost("register")]
+		public async Task<IActionResult> Register([FromBody] User user)
+		{
+			if (user == null) return StatusCode(StatusCodes.Status400BadRequest);
+
+			user.IsAdmin = false;
+			user.IsOwner = false;
+			user.OrganisationId = 3;
+
+			string userPass = user.Password;
+
+			var newUser = await _userService.PostUser(user);
+			if (newUser == null) return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+
+			var response = _userService.Authenticate(newUser.Email, userPass);
+			if (response.user == null) return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+
+			return Ok(new { user = response.user, token = response.token });
+		}
     }
 }
