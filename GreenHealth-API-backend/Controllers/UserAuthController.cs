@@ -26,6 +26,7 @@ namespace GreenHealth_API_backend.Controllers
             return Ok(new { user = response.user, token = response.token });
         }
 
+
 		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromBody] User user)
 		{
